@@ -22,8 +22,10 @@ public class Flashcard {
     @JsonBackReference
     private Deck deck;
 
-    public Flashcard(Deck deck) {
+    public Flashcard(Deck deck, String frontText, String backText) {
         this.deck = deck;
+        this.frontText = frontText;
+        this.backText = backText;
     }
 
     public Flashcard() {

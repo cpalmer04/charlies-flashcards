@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DeckRepository extends JpaRepository<Deck, Long> {
+    Deck findByDeckId(int deckId);
 }
