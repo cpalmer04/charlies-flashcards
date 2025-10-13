@@ -1,0 +1,4 @@
+To Do:
+
+1. Add login functionality by interacting with the backend -> very basic just call the endpoint using submission
+2. Add dynamic CSS for iphone functionality with @Media and rem ??

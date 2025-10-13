@@ -1,5 +1,6 @@
 package com.cpalmer.projects.flashcards.controller;
 
+import com.cpalmer.projects.flashcards.data.LoginRequest;
 import com.cpalmer.projects.flashcards.entity.Deck;
 import com.cpalmer.projects.flashcards.entity.Flashcard;
 import com.cpalmer.projects.flashcards.entity.User;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins="*")
 @RequestMapping("api")
 public class FlashcardsApplicationController {
 
@@ -25,23 +27,17 @@ public class FlashcardsApplicationController {
         this.flashcardRepository = flashcardRepository;
     }
 
-    /*
-     * Gets a user by a correct username and password
-     * Ideally, this will be used as all-in-one access to a users decks and the flashcards in each deck
-     *
-     * @param username  the username of the user
-     * @param password  the correct password associated with that username
-     * @return          the associated response (ok with the user / not found)
-     */
-    @GetMapping("/get/user/{username}/{password}")
-    public ResponseEntity<User> getUserByIdAndPassword(@PathVariable String username, @PathVariable String password) {
-        System.out.println("Getting user....");
-        User user = userRepository.findByUserNameAndUserPasswordHash(username, password);
+    @PostMapping("/login")
+    public ResponseEntity<User> getUserByIdAndPassword(@RequestBody LoginRequest loginRequest) {
+        User user = userRepository.findByUserNameAndUserPasswordHash(
+                loginRequest.username(), loginRequest.password()
+        );
+
         if (user != null) {
-            System.out.println("User found: " + user.toString());
+            System.out.println("User found: " + user);
             return ResponseEntity.ok(user);
         } else {
-            System.out.println("No user found with username: " + username + " and password " + password);
+            System.out.println("No user found");
             return ResponseEntity.notFound().build();
         }
     }
