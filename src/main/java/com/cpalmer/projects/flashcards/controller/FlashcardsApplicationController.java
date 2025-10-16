@@ -1,5 +1,6 @@
 package com.cpalmer.projects.flashcards.controller;
 
+import com.cpalmer.projects.flashcards.data.CreateDeckRequest;
 import com.cpalmer.projects.flashcards.data.LoginRequest;
 import com.cpalmer.projects.flashcards.entity.Deck;
 import com.cpalmer.projects.flashcards.entity.Flashcard;
@@ -42,19 +43,14 @@ public class FlashcardsApplicationController {
         }
     }
 
-    /*
-     * Creates a new deck
-     * A user must be signed in to have the ability to create a new deck - userId therefore is always valid
-     *
-     * @param userId    the ID of the user
-     * @param deckName  the name of the deck to be made
-     * @return          an ok response including the created deck
-     */
-    @PostMapping("/create/deck/{userId}/{deckName}")
-    public ResponseEntity<Deck> createNewDeck(@PathVariable int userId, @PathVariable String deckName) {
+    @PostMapping("/create/deck")
+    public ResponseEntity<Deck> createNewDeck(@RequestBody CreateDeckRequest createDeckRequest) {
+        int userId = createDeckRequest.userId();
+        String deckName = createDeckRequest.deckName();
         User associatedUser = userRepository.findByUserId(userId); // Should always be a valid user due to logging in
         Deck deck = new Deck(deckName, associatedUser);
         Deck savedDeck = deckRepository.save(deck);
+        System.out.println(savedDeck);
         return ResponseEntity.ok(savedDeck);
     }
 

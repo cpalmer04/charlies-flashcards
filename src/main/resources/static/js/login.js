@@ -1,3 +1,9 @@
+// Navigate back to decks is user attempts to go back to login
+const storedUser = sessionStorage.getItem('user');
+if (storedUser) {
+    window.location.href = "decks.html";
+}
+
 const { createApp } = Vue;
 
 createApp({
@@ -16,13 +22,11 @@ createApp({
                 });
 
                 console.log('Login successful:', response.data);
-                alert('Login successful!');
 
                 sessionStorage.setItem('user', JSON.stringify(response.data));
                 window.location.href="decks.html";
             } catch (error) {
                 console.error('Login failed:', error);
-                alert('Invalid username or password.');
             }
         }
     }
