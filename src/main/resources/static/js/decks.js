@@ -21,6 +21,7 @@ createApp({
     methods: {
         openDeck(deck) {
             sessionStorage.setItem('currentDeck', JSON.stringify(deck));
+            sessionStorage.setItem('deckIndex', this.decks.indexOf(deck));
             window.location.href = 'flashcards.html';
         },
         createDeck() {

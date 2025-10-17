@@ -1,15 +1,10 @@
 To Do:
 
-Login works now and flashcards work
+1. Finish frontend functionality entirely
 
-1. have an add deck option that interacts with the backend to create a new deck for the user, make sure you can
-interact with it in the frontend and make it pretty / fit in
+2. update back end to make things more secure - maybe JWT or something like that? Looks good on resume..
 
-2. when you click on a deck have it go to a flashcards UI where you can navigate through the flashcards front and
-back text, with a reveal button that shows the back. Also have an add flashcard option to create a new flashcard.
+3. Add javadoc
 
-3. update back end to make things more secure / better and improve standards, maybe watch that youtube tutorial?
-Perhaps look into whatever JWT is - check what that youtuber did
-
-4. Try and get it deployed when all finished up
+4. Figure out how to deploy using render (and a dockerfile)
 

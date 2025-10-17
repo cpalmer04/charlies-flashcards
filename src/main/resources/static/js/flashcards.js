@@ -23,7 +23,7 @@ createApp({
         if (this.flashcards[this.currentFlashcard] != null) {
             container.textContent = this.flashcards[this.currentFlashcard].frontText;
         } else {
-            container.textContent = "Deck is empty";
+            this.getNextCard();
         }
     },
     methods: {
@@ -38,6 +38,8 @@ createApp({
                 } else {
                     container.textContent = this.flashcards[this.currentFlashcard].frontText;
                 }
+            } else {
+                this.createFlashcard();
             }
         },
         getNextCard() {
@@ -62,50 +64,69 @@ createApp({
             }
         },
         createFlashcard() {
-            const container = document.getElementById("createFlashcard");
+            const container = document.getElementById("currentFlashcard");
             const plusSign = document.getElementById("plusSign");
 
-            container.removeChild(plusSign);
+            container.textContent = "";
 
             if (document.getElementById("textbox")) return;
 
-            const newTextBox = document.createElement("input");
-            newTextBox.id = "textbox";
-            newTextBox.type = "text";
-            newTextBox.placeholder = "Enter deck name";
-            container.appendChild(newTextBox);
+            const frontTextbox = document.createElement("input");
+            frontTextbox.id = "frontTextbox";
+            frontTextbox.type = "text";
+            frontTextbox.placeholder = "Enter text for front of card";
+            container.appendChild(frontTextbox);
 
-            newTextBox.focus()
+            frontTextbox.focus()
 
-            newTextBox.addEventListener("keypress", async (e) => {
-                if (e.key === "Enter") {
-                    const name = newTextBox.value.trim();
-                    if (name) {
-                        /*container.appendChild(plusSign);
-                        container.removeChild(newTextBox);
-                        try {
-                            // Send POST request to rest endpoint to create a new deck
-                            const storedDeck = sessionStorage.getItem('currentDeck');
-                            const deckObj = JSON.parse(storedDeck);
-                            const storedDeckId = deckObj.deckId;
-                            const response = await axios.post('http://localhost:29001/api/create/flashcard', {
-                                userId: storedUserId,
-                                deckName: name
-                            });
-
-                            // Update the UI to have the new deck
-                            const createdDeck = response.data;
-                            if (!createdDeck.flashcards) {
-                                createdDeck.flashcards = [];
-                            }
-                            userObj.decks.push(createdDeck);
-                            sessionStorage.setItem('user', JSON.stringify(userObj));
-                            this.decks.push(createdDeck);
-                        } catch (error) {
-                            console.error('Deck creation failed:', error);
-                        }*/
+            frontTextbox.addEventListener("keypress", async (frontEvent) => {
+                if (frontEvent.key === "Enter") {
+                    const front = frontTextbox.value.trim();
+                    if (!front) {
+                        alert("Enter a front text");
                     } else {
-                        alert("Please enter a deck name!");
+                        container.removeChild(frontTextbox);
+                        const backTextbox = document.createElement("input");
+                        backTextbox.id = "backTextbox";
+                        backTextbox.type = "text";
+                        backTextbox.placeholder = "Enter text for back of card";
+                        container.appendChild(backTextbox);
+                        backTextbox.focus();
+
+                        backTextbox.addEventListener("keypress", async (backEvent) => {
+                            if (backEvent.key === "Enter") {
+                                const back = backTextbox.value.trim();
+                                if (!back) {
+                                    alert("Enter a back text")
+                                } else {
+                                    try {
+                                        const storedDeck = sessionStorage.getItem('currentDeck');
+                                        const deckObj = JSON.parse(storedDeck);
+                                        const storedDeckId = deckObj.deckId;
+                                        const response = await axios.post('http://localhost:29001/api/create/flashcard', {
+                                            deckId: storedDeckId,
+                                            frontText: front,
+                                            backText: back
+                                        });
+                                        container.removeChild(backTextbox);
+                                        const createdFlashcard = response.data;
+                                        deckObj.flashcards.push(createdFlashcard);
+
+                                        const storedUser = sessionStorage.getItem('user');
+                                        const userObj = JSON.parse(storedUser);
+                                        const deckIndex = sessionStorage.getItem('deckIndex');
+                                        userObj.decks[deckIndex] = deckObj;
+                                        sessionStorage.setItem('user',  JSON.stringify(userObj));
+
+                                        sessionStorage.setItem('currentDeck', JSON.stringify(deckObj));
+                                        this.flashcards.push(createdFlashcard);
+                                    } catch (error) {
+                                        console.error('Flashcard creation failed:', error);
+                                    }
+                                    container.textContent = this.flashcards[this.currentFlashcard].frontText;
+                                }
+                            }
+                        });
                     }
                 }
             });

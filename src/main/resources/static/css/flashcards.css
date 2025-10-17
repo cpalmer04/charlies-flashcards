@@ -132,6 +132,7 @@ h2 {
 
 /* Flashcard Styling */
 #currentFlashcard {
+    user-select: none;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 24px;
@@ -142,8 +143,10 @@ h2 {
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 15px;
     font-size: 24px;
     font-weight: 600;
     color: #2d3748;
@@ -151,6 +154,8 @@ h2 {
     border: 2px solid rgba(255,255,255,0.3);
     animation: slideIn 0.6s ease-out 0.2s both;
     transform-style: preserve-3d;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 @keyframes slideIn {
@@ -183,6 +188,51 @@ h2 {
 
 #currentFlashcard:active {
     transform: scale(0.98);
+}
+
+/* Plus sign styling when dynamically added */
+#currentFlashcard span {
+    font-size: 48px;
+    font-weight: 300;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+#currentFlashcard span:hover {
+    transform: rotate(90deg) scale(1.2);
+    color: #764ba2;
+}
+
+/* Input textbox styling for card creation */
+#currentFlashcard input[type="text"],
+#frontTextbox,
+#backTextbox {
+    width: 90%;
+    padding: 16px 20px;
+    font-size: 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    color: #2d3748;
+    transition: all 0.3s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+#currentFlashcard input[type="text"]:focus,
+#frontTextbox:focus,
+#backTextbox:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+#currentFlashcard input[type="text"]::placeholder,
+#frontTextbox::placeholder,
+#backTextbox::placeholder {
+    color: #a0aec0;
 }
 
 /* Flip Animation */
@@ -295,12 +345,26 @@ h2 {
         margin-bottom: 30px;
     }
 
-    #navToDeck,
+    #navToDeck {
+        width: 45px;
+        height: 45px;
+    }
 
     #currentFlashcard {
         padding: 40px 30px;
         min-height: 250px;
         font-size: 20px;
+    }
+
+    #currentFlashcard span {
+        font-size: 40px;
+    }
+
+    #currentFlashcard input[type="text"],
+    #frontTextbox,
+    #backTextbox {
+        font-size: 16px;
+        padding: 14px 18px;
     }
 
     #prevCard,
@@ -317,7 +381,10 @@ h2 {
         margin-bottom: 25px;
     }
 
-    #navToDeck,
+    #navToDeck {
+        width: 40px;
+        height: 40px;
+    }
 
     #navToDeck::before {
         width: 16px;
@@ -329,6 +396,18 @@ h2 {
         min-height: 200px;
         font-size: 18px;
         margin-bottom: 30px;
+    }
+
+    #currentFlashcard span {
+        font-size: 36px;
+    }
+
+    #currentFlashcard input[type="text"],
+    #frontTextbox,
+    #backTextbox {
+        font-size: 15px;
+        padding: 12px 16px;
+        width: 95%;
     }
 
     #prevCard,

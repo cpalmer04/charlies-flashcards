@@ -54,7 +54,7 @@ public class FlashcardsApplicationController {
     }
 
     @PostMapping("/create/flashcard")
-    public ResponseEntity<Flashcard> createFlashcard(CreateFlashcardRequest createFlashcardRequest) {
+    public ResponseEntity<Flashcard> createFlashcard(@RequestBody CreateFlashcardRequest createFlashcardRequest) {
         int deckId = createFlashcardRequest.deckId();
         String frontText = createFlashcardRequest.frontText();
         String backText = createFlashcardRequest.backText();
