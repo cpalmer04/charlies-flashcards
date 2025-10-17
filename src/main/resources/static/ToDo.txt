@@ -1,0 +1,10 @@
+To Do:
+
+1. Finish frontend functionality entirely
+
+2. update back end to make things more secure - maybe JWT or something like that? Looks good on resume..
+
+3. Add javadoc
+
+4. Figure out how to deploy using render (and a dockerfile)
+

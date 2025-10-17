@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Decks</title>
+    <link rel="stylesheet" href="css/decks.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<h1>Your Flashcard Decks</h1>
+<div id="decks">
+    <div class="deck-card" v-for="deck in decks" :key="deck.id" @click="openDeck(deck)">
+        <div class="deck-name">{{ deck.deckName }}</div>
+        <div class="deck-size">{{ deck.flashcards.length }} Terms</div>
+    </div>
+
+    <div class="deck-card" id="newDeck" @click="createDeck">
+        <div class="deck-name" id="newDeckText">Add New Deck</div>
+        <p id="plusSign">+</p>
+    </div>
+</div>
+
+<script src="js/decks.js"></script>
+</body>
+</html>

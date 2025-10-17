@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deck Flashcards</title>
+    <link rel="stylesheet" href="css/flashcards.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div id="flashcards">
+    <h2>{{ deck?.deckName }}</h2>
+
+    <button id="navToDeck" @click="navToDeck"></button>
+
+    <div id="currentFlashcard" @click="flipCard"></div>
+
+    <button id="prevCard" @click="getPrevCard">Prev</button>
+
+    <button id="nextCard" @click="getNextCard">Next</button>
+</div>
+
+<script src="js/flashcards.js"></script>
+</body>
+</html>

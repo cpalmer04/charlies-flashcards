@@ -1,0 +1,26 @@
+Database Tables Rough Draft
+
+1. Users
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    user_name VARCHAR(20) UNIQUE NOT NULL,
+    user_password_hash VARCHAR(255) NOT NULL
+);
+
+2. Decks
+CREATE TABLE decks (
+    deck_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    deck_name VARCHAR(20) NOT NULL
+);
+
+3. Flashcards
+CREATE TABLE flashcards (
+    flashcard_id SERIAL PRIMARY KEY,
+    deck_id INT NOT NULL REFERENCES decks(deck_id) ON DELETE CASCADE,
+    front_text TEXT,
+    back_text TEXT
+);
+
+users 1-m decks
+decks 1-m flashcards
