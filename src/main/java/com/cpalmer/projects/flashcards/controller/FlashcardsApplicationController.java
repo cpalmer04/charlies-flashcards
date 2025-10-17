@@ -1,6 +1,7 @@
 package com.cpalmer.projects.flashcards.controller;
 
 import com.cpalmer.projects.flashcards.data.CreateDeckRequest;
+import com.cpalmer.projects.flashcards.data.CreateFlashcardRequest;
 import com.cpalmer.projects.flashcards.data.LoginRequest;
 import com.cpalmer.projects.flashcards.entity.Deck;
 import com.cpalmer.projects.flashcards.entity.Flashcard;
@@ -20,7 +21,6 @@ public class FlashcardsApplicationController {
     private final DeckRepository deckRepository;
     private final FlashcardRepository flashcardRepository;
 
-
     public FlashcardsApplicationController(UserRepository userRepository, DeckRepository deckRepository,
                                            FlashcardRepository flashcardRepository) {
         this.userRepository = userRepository;
@@ -35,10 +35,8 @@ public class FlashcardsApplicationController {
         );
 
         if (user != null) {
-            System.out.println("User found: " + user);
             return ResponseEntity.ok(user);
         } else {
-            System.out.println("No user found");
             return ResponseEntity.notFound().build();
         }
     }
@@ -47,28 +45,24 @@ public class FlashcardsApplicationController {
     public ResponseEntity<Deck> createNewDeck(@RequestBody CreateDeckRequest createDeckRequest) {
         int userId = createDeckRequest.userId();
         String deckName = createDeckRequest.deckName();
-        User associatedUser = userRepository.findByUserId(userId); // Should always be a valid user due to logging in
+
+        User associatedUser = userRepository.findByUserId(userId);
         Deck deck = new Deck(deckName, associatedUser);
         Deck savedDeck = deckRepository.save(deck);
-        System.out.println(savedDeck);
+
         return ResponseEntity.ok(savedDeck);
     }
 
-    /*
-     * Creates a new flashcard in a specific deck
-     * Must be navigated into a deck to create a new flashcard - deckId therefore is always valid
-     *
-     * @param deckId     the ID of the deck to which the flashcard belongs
-     * @param frontText  the text displayed on the front of the flashcard
-     * @param backText   the text displayed on the back of the flashcard
-     * @return           an ok response including the created flashcard
-     */
-    @PostMapping("/create/flashcard/{deckId}/{frontText}/{backText}")
-    public ResponseEntity<Flashcard> createFlashcard(@PathVariable int deckId, @PathVariable String frontText,
-                                                     @PathVariable String backText) {
+    @PostMapping("/create/flashcard")
+    public ResponseEntity<Flashcard> createFlashcard(CreateFlashcardRequest createFlashcardRequest) {
+        int deckId = createFlashcardRequest.deckId();
+        String frontText = createFlashcardRequest.frontText();
+        String backText = createFlashcardRequest.backText();
+
         Deck deck = deckRepository.findByDeckId(deckId);
         Flashcard flashcard = new Flashcard(deck, frontText, backText);
         Flashcard savedFlashcard = flashcardRepository.save(flashcard);
+
         return ResponseEntity.ok(savedFlashcard);
     }
 

@@ -11,11 +11,13 @@
 <div id="flashcards">
     <h2>{{ deck?.deckName }}</h2>
 
-    <div v-if="flashcards.length > 0" id="currentFlashcard">
-        {{ flashcards[currentFlashcard].frontText }}
-    </div>
+    <button id="navToDeck" @click="navToDeck"></button>
 
-    <p v-else>No flashcards in this deck.</p>
+    <div id="currentFlashcard" @click="flipCard"></div>
+
+    <button id="prevCard" @click="getPrevCard">Prev</button>
+
+    <button id="nextCard" @click="getNextCard">Next</button>
 </div>
 
 <script src="js/flashcards.js"></script>
