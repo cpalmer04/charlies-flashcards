@@ -12,7 +12,21 @@
 <div id="decks">
     <div class="deck-card" v-for="deck in decks" :key="deck.id" @click="openDeck(deck)">
         <div class="deck-name">{{ deck.deckName }}</div>
-        <div class="deck-size">{{ deck.flashcards.length }} Terms</div>
+        <div class="deck-size">
+            {{ deck.flashcards.length }} Cards
+            -
+            <span v-if="deck.nextReviewDate">
+              <template v-if="getDaysUntilReview(deck.nextReviewDate) === 0">
+                review today
+              </template>
+              <template v-else>
+                review in {{ getDaysUntilReview(deck.nextReviewDate) }} days
+              </template>
+            </span>
+            <span v-else>
+              review today
+            </span>
+        </div>
     </div>
 
     <div class="deck-card" id="newDeck" @click="createDeck">

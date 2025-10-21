@@ -13,6 +13,7 @@ import com.cpalmer.projects.flashcards.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RestController
@@ -64,6 +65,38 @@ public class FlashcardsApplicationController {
 
         deckRepository.deleteById(deckId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/complete/deck/{deckId}")
+    public ResponseEntity<Deck> completeDeck(@PathVariable int deckId) {
+        Optional<Deck> deck = deckRepository.findById(deckId);
+
+        if (deck.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Deck newDeck = deck.get();
+
+        Integer reviewInterval = newDeck.getReviewInterval();
+
+        Integer nextReview;
+        if (reviewInterval == null) {
+            nextReview = 1;
+        } else if (reviewInterval == 1) {
+            nextReview = 3;
+        } else if (reviewInterval == 3) {
+            nextReview = 7;
+        } else if (reviewInterval == 7) {
+            nextReview = 14;
+        } else {
+            nextReview = 21;
+        }
+
+        newDeck.setReviewInterval(nextReview);
+        newDeck.setNextReviewDate(LocalDateTime.now().plusDays(nextReview));
+
+        Deck updated = deckRepository.save(newDeck);
+        return ResponseEntity.ok(updated);
     }
 
     @PostMapping("/create/flashcard")

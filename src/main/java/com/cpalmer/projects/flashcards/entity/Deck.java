@@ -3,6 +3,9 @@ package com.cpalmer.projects.flashcards.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -15,6 +18,12 @@ public class Deck {
 
     @Column(nullable = false)
     private String deckName;
+
+    @Column
+    private LocalDateTime nextReviewDate;
+
+    @Column
+    private Integer reviewInterval;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -63,6 +72,22 @@ public class Deck {
 
     public void setFlashcards(List<Flashcard> flashcards) {
         this.flashcards = flashcards;
+    }
+
+    public LocalDateTime getNextReviewDate() {
+        return nextReviewDate;
+    }
+
+    public void setNextReviewDate(LocalDateTime nextReviewDate) {
+        this.nextReviewDate = nextReviewDate;
+    }
+
+    public Integer getReviewInterval() {
+        return reviewInterval;
+    }
+
+    public void setReviewInterval(Integer reviewInterval) {
+        this.reviewInterval = reviewInterval;
     }
 
 }

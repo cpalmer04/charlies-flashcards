@@ -52,8 +52,35 @@ createApp({
                 editTextButton.id = "editTextButton";
                 editTextButton.textContent = "Edit text";
                 options.appendChild(editTextButton);
+
+                const markAsCompleteButton = document.createElement("button");
+                markAsCompleteButton.onclick = () => this.markAsComplete();
+                markAsCompleteButton.id = "markAsCompleteButton";
+                markAsCompleteButton.textContent = "Mark as completed";
+                options.appendChild(markAsCompleteButton);
             } else {
                 options.innerHTML = "";
+            }
+        },
+        async markAsComplete() {
+            const deckId = this.deck.deckId;
+
+            try {
+                const response = await axios.put(`http://localhost:29001/api/complete/deck/${deckId}`);
+
+                const deck = response.data;
+                sessionStorage.setItem('currentDeck', JSON.stringify(deck));
+
+                const storedUser = sessionStorage.getItem('user');
+                const userObj = JSON.parse(storedUser);
+                const deckIndex = sessionStorage.getItem('deckIndex');
+                userObj.decks[deckIndex] = deck;
+                sessionStorage.setItem('user',  JSON.stringify(userObj));
+
+                window.location.href = 'decks.html';
+            } catch (error) {
+                alert("Deck not found or other error occurred!");
+                throw error;
             }
         },
         confirmDeleteFlashcard() {
