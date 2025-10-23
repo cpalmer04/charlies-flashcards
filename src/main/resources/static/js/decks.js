@@ -8,15 +8,14 @@ createApp({
         };
     },
     mounted() {
-        const storedUser = sessionStorage.getItem('user');
-
-        if (storedUser) {
-            this.user = JSON.parse(storedUser);
-            this.decks = this.user.decks || [];
-        } else {
-            sessionStorage.removeItem('user');
-            window.location.href = 'login.html';
-        }
+        axios.get('/api/current-user')
+            .then(response => {
+                this.user = response.data;
+                this.decks = this.user.decks || [];
+            })
+            .catch(error => {
+                window.location.href = 'login.html';
+            });
     },
     methods: {
         openDeck(deck) {
@@ -60,11 +59,9 @@ createApp({
                         container.removeChild(newTextBox);
                         try {
                             // Send POST request to rest endpoint to create a new deck
-                            const storedUser = sessionStorage.getItem('user');
-                            const userObj = JSON.parse(storedUser);
-                            const storedUserId = userObj.userId;
+                            const userId = this.user.userId
                             const response = await axios.post('http://localhost:29001/api/create/deck', {
-                                userId: storedUserId,
+                                userId: userId,
                                 deckName: name
                             });
 
@@ -73,9 +70,7 @@ createApp({
                             if (!createdDeck.flashcards) {
                                 createdDeck.flashcards = [];
                             }
-                            userObj.decks.push(createdDeck);
-                            sessionStorage.setItem('user', JSON.stringify(userObj));
-                            this.decks.push(createdDeck);
+                            this.user.decks.push(createdDeck);
                         } catch (error) {
                             console.error('Deck creation failed:', error);
                         }

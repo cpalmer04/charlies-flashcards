@@ -13,18 +13,18 @@ public class User {
     private int userId;
 
     @Column(unique = true, nullable = false)
-    private String userName;
+    private String username;
 
     @Column(nullable = false)
-    private String userPasswordHash;
+    private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Deck> decks;
 
-    public User(String userName, String userPasswordHash) {
-        this.userName = userName;
-        this.userPasswordHash = userPasswordHash;
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
     public User() {
@@ -38,20 +38,20 @@ public class User {
         this.userId = userId;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getUserPasswordHash() {
-        return userPasswordHash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setUserPasswordHash(String userPasswordHash) {
-        this.userPasswordHash = userPasswordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Deck> getDecks() {

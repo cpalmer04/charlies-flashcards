@@ -76,6 +76,12 @@ body::after {
     border-radius: 24px 24px 0 0;
 }
 
+#error-message {
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
 h1 {
     margin: 0 0 40px 0;
     font-size: 32px;

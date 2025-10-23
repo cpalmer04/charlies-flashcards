@@ -2,7 +2,6 @@ package com.cpalmer.projects.flashcards.controller;
 
 import com.cpalmer.projects.flashcards.data.CreateDeckRequest;
 import com.cpalmer.projects.flashcards.data.CreateFlashcardRequest;
-import com.cpalmer.projects.flashcards.data.LoginRequest;
 import com.cpalmer.projects.flashcards.data.UpdateFlashcardRequest;
 import com.cpalmer.projects.flashcards.entity.Deck;
 import com.cpalmer.projects.flashcards.entity.Flashcard;
@@ -10,14 +9,15 @@ import com.cpalmer.projects.flashcards.entity.User;
 import com.cpalmer.projects.flashcards.repository.DeckRepository;
 import com.cpalmer.projects.flashcards.repository.FlashcardRepository;
 import com.cpalmer.projects.flashcards.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins="*")
 @RequestMapping("api")
 public class FlashcardsApplicationController {
 
@@ -32,17 +32,21 @@ public class FlashcardsApplicationController {
         this.flashcardRepository = flashcardRepository;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<User> getUserByIdAndPassword(@RequestBody LoginRequest loginRequest) {
-        User user = userRepository.findByUserNameAndUserPasswordHash(
-                loginRequest.username(), loginRequest.password()
-        );
+    @GetMapping("/current-user")
+    public ResponseEntity<User> getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-        if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
+
+        if (user == null) {
             return ResponseEntity.notFound().build();
         }
+
+        user.setPassword(null);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/create/deck")

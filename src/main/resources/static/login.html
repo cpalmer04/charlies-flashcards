@@ -11,20 +11,28 @@
 
 <div id="login">
     <h1>Login</h1>
-    <form @submit.prevent="loginUser">
+    <form method="POST" action="/login">
         <div id="username">
             <label>Username</label>
-            <input type="text" v-model="username" placeholder="Type your username">
+            <input type="text" name="username" required>
         </div>
         <div id="password">
             <label>Password</label>
-            <input type="password" v-model="password" placeholder="Type your password">
+            <input type="password" name="password" required>
         </div>
-        <button type="submit">LOGIN</button>
+        <button type="submit">Login</button>
     </form>
-    <!--  <p v-if="errorMessage" class="error">{{ errorMessage }}</p>  -->
+
+    <p id="error-message"></p>
 </div>
 
-<script src="js/login.js"></script>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "true") {
+        document.getElementById("error-message").textContent = "Invalid username or password";
+    }
+</script>
+
+
 </body>
 </html>

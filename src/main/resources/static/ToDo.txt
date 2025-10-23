@@ -1,10 +1,11 @@
 To Do:
 
-1. Finish frontend functionality entirely
+1. Use basic spring security to secure endpoint  done
 
-2. update back end to make things more secure - maybe JWT or something like that? Looks good on resume..
+2. Create sign up option
 
-3. Add javadoc
+3. Use password Bcrypt encoder instead of NoOp
 
-4. Figure out how to deploy using render (and a dockerfile)
+4. Use JWT tokens
 
+5. Limit number of flashcards, decks, and users that can be created

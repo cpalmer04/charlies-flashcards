@@ -71,12 +71,6 @@ createApp({
                 const deck = response.data;
                 sessionStorage.setItem('currentDeck', JSON.stringify(deck));
 
-                const storedUser = sessionStorage.getItem('user');
-                const userObj = JSON.parse(storedUser);
-                const deckIndex = sessionStorage.getItem('deckIndex');
-                userObj.decks[deckIndex] = deck;
-                sessionStorage.setItem('user',  JSON.stringify(userObj));
-
                 window.location.href = 'decks.html';
             } catch (error) {
                 alert("Deck not found or other error occurred!");
@@ -134,11 +128,6 @@ createApp({
                 throw error;
             }
 
-            const storedUser = sessionStorage.getItem('user');
-            const userObj = JSON.parse(storedUser);
-            const deckIndex = sessionStorage.getItem('deckIndex');
-            userObj.decks.splice(deckIndex, 1);
-            sessionStorage.setItem('user',  JSON.stringify(userObj));
             window.location.href = 'decks.html';
         },
         async deleteFlashcard() {
@@ -163,13 +152,6 @@ createApp({
             const deckObj = JSON.parse(storedDeck);
             deckObj.flashcards.splice(this.currentFlashcard, 1);
             sessionStorage.setItem('currentDeck', JSON.stringify(deckObj));
-
-            // Update stored user
-            const storedUser = sessionStorage.getItem('user');
-            const userObj = JSON.parse(storedUser);
-            const deckIndex = sessionStorage.getItem('deckIndex');
-            userObj.decks[deckIndex] = deckObj;
-            sessionStorage.setItem('user',  JSON.stringify(userObj));
 
             const container = document.getElementById("currentFlashcard");
 
@@ -238,11 +220,6 @@ createApp({
                         const deckObj = JSON.parse(storedDeck);
                         deckObj.flashcards[this.currentFlashcard] = updatedCard;
                         sessionStorage.setItem('currentDeck', JSON.stringify(deckObj));
-
-                        const storedUser = sessionStorage.getItem('user');
-                        const userObj = JSON.parse(storedUser);
-                        userObj.decks[deckIndex] = deckObj;
-                        sessionStorage.setItem('user', JSON.stringify(userObj));
 
                         this.flashcards[this.currentFlashcard] = updatedCard;
 
@@ -349,12 +326,6 @@ createApp({
                                         container.removeChild(backTextbox);
                                         const createdFlashcard = response.data;
                                         deckObj.flashcards.push(createdFlashcard);
-
-                                        const storedUser = sessionStorage.getItem('user');
-                                        const userObj = JSON.parse(storedUser);
-                                        const deckIndex = sessionStorage.getItem('deckIndex');
-                                        userObj.decks[deckIndex] = deckObj;
-                                        sessionStorage.setItem('user',  JSON.stringify(userObj));
 
                                         sessionStorage.setItem('currentDeck', JSON.stringify(deckObj));
                                         this.flashcards.push(createdFlashcard);
