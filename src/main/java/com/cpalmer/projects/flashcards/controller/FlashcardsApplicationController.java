@@ -2,6 +2,7 @@ package com.cpalmer.projects.flashcards.controller;
 
 import com.cpalmer.projects.flashcards.data.CreateDeckRequest;
 import com.cpalmer.projects.flashcards.data.CreateFlashcardRequest;
+import com.cpalmer.projects.flashcards.data.CreateUserRequest;
 import com.cpalmer.projects.flashcards.data.UpdateFlashcardRequest;
 import com.cpalmer.projects.flashcards.entity.Deck;
 import com.cpalmer.projects.flashcards.entity.Flashcard;
@@ -12,6 +13,7 @@ import com.cpalmer.projects.flashcards.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -24,12 +26,14 @@ public class FlashcardsApplicationController {
     private final UserRepository userRepository;
     private final DeckRepository deckRepository;
     private final FlashcardRepository flashcardRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public FlashcardsApplicationController(UserRepository userRepository, DeckRepository deckRepository,
-                                           FlashcardRepository flashcardRepository) {
+                                           FlashcardRepository flashcardRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.deckRepository = deckRepository;
         this.flashcardRepository = flashcardRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/current-user")
@@ -48,6 +52,23 @@ public class FlashcardsApplicationController {
         user.setPassword(null);
         return ResponseEntity.ok(user);
     }
+
+    @PostMapping("/signup")
+    public ResponseEntity<Void> signupUser(@RequestBody CreateUserRequest createUserRequest) {
+        String username = createUserRequest.username();
+        String password = createUserRequest.password();
+
+        if (userRepository.findByUsername(username) != null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String encodedPassword = passwordEncoder.encode(password);
+        User newUser = new User(username, encodedPassword);
+        userRepository.save(newUser);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
 
     @PostMapping("/create/deck")
     public ResponseEntity<Deck> createNewDeck(@RequestBody CreateDeckRequest createDeckRequest) {

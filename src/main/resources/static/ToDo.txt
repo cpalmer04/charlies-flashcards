@@ -2,10 +2,12 @@ To Do:
 
 1. Use basic spring security to secure endpoint  done
 
-2. Create sign up option
+2. Create sign up option   done
 
-3. Use password Bcrypt encoder instead of NoOp
+3. Use password Bcrypt encoder instead of NoOp   done
 
 4. Use JWT tokens
 
-5. Limit number of flashcards, decks, and users that can be created
+5. Limit number of user, decks and flashcards
+
+6. Limit number of flashcards, decks, and users that can be created

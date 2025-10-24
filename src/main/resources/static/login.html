@@ -10,6 +10,7 @@
 <body>
 
 <div id="login">
+    <button id="create-account">Create Account</button>
     <h1>Login</h1>
     <form method="POST" action="/login">
         <div id="username">
@@ -24,15 +25,9 @@
     </form>
 
     <p id="error-message"></p>
+    <p id="signed-up-message"></p>
 </div>
 
-<script>
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("error") === "true") {
-        document.getElementById("error-message").textContent = "Invalid username or password";
-    }
-</script>
-
-
+<script src="js/login.js"></script>
 </body>
 </html>

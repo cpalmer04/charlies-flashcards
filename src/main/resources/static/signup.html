@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Signup Page</title>
+  <link rel="stylesheet" href="css/login.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+
+<div id="login">
+  <button id="back">Back</button>
+  <h1>Sign up</h1>
+  <form id="signupForm">
+    <div id="username">
+      <label>Create a username</label>
+      <input type="text" name="username" id="entered-username" required>
+    </div>
+    <div id="password">
+      <label>Create a password</label>
+      <input type="password" name="password" id="entered-password" required>
+    </div>
+    <button type="submit">Create account</button>
+  </form>
+
+  <p id="error-message"></p>
+</div>
+
+<script src="js/signup.js"></script>
+</body>
+</html>
