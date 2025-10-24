@@ -8,6 +8,7 @@ createApp({
         };
     },
     mounted() {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${sessionStorage.getItem('jwt')}`;
         axios.get('/api/current-user')
             .then(response => {
                 this.user = response.data;

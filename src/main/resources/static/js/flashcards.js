@@ -10,6 +10,7 @@ createApp({
         };
     },
     mounted() {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${sessionStorage.getItem('jwt')}`;
         const storedDeck = sessionStorage.getItem('currentDeck');
 
         if (storedDeck) {

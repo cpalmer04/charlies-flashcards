@@ -1,18 +1,21 @@
 package com.cpalmer.projects.flashcards.controller;
 
-import com.cpalmer.projects.flashcards.data.CreateDeckRequest;
-import com.cpalmer.projects.flashcards.data.CreateFlashcardRequest;
-import com.cpalmer.projects.flashcards.data.CreateUserRequest;
-import com.cpalmer.projects.flashcards.data.UpdateFlashcardRequest;
+import com.cpalmer.projects.flashcards.data.*;
 import com.cpalmer.projects.flashcards.entity.Deck;
 import com.cpalmer.projects.flashcards.entity.Flashcard;
 import com.cpalmer.projects.flashcards.entity.User;
 import com.cpalmer.projects.flashcards.repository.DeckRepository;
 import com.cpalmer.projects.flashcards.repository.FlashcardRepository;
 import com.cpalmer.projects.flashcards.repository.UserRepository;
+import com.cpalmer.projects.flashcards.security.FlashcardUserDetailsService;
+import com.cpalmer.projects.flashcards.security.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,13 +30,21 @@ public class FlashcardsApplicationController {
     private final DeckRepository deckRepository;
     private final FlashcardRepository flashcardRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final FlashcardUserDetailsService userDetailsService;
+    private final AuthenticationManager authenticationManager;
 
     public FlashcardsApplicationController(UserRepository userRepository, DeckRepository deckRepository,
-                                           FlashcardRepository flashcardRepository, PasswordEncoder passwordEncoder) {
+                                           FlashcardRepository flashcardRepository, PasswordEncoder passwordEncoder,
+                                           JwtService jwtService, FlashcardUserDetailsService userDetailsService,
+                                           AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.deckRepository = deckRepository;
         this.flashcardRepository = flashcardRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+        this.authenticationManager = authenticationManager;
     }
 
     @GetMapping("/current-user")
@@ -53,8 +64,34 @@ public class FlashcardsApplicationController {
         return ResponseEntity.ok(user);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UserRequest userRequest) {
+        try {
+
+            User user = userRepository.findByUsername(userRequest.username());
+
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            userRequest.username(),
+                            userRequest.password()
+                    )
+            );
+
+            var userDetails = userDetailsService.loadUserByUsername(userRequest.username());
+            String token = jwtService.generateToken(userDetails.getUsername());
+
+            return ResponseEntity.ok(new LoginResponse(token));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
     @PostMapping("/signup")
-    public ResponseEntity<Void> signupUser(@RequestBody CreateUserRequest createUserRequest) {
+    public ResponseEntity<Void> signupUser(@RequestBody UserRequest createUserRequest) {
         String username = createUserRequest.username();
         String password = createUserRequest.password();
 
