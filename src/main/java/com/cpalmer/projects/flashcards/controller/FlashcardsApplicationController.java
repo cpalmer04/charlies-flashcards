@@ -9,13 +9,15 @@ import com.cpalmer.projects.flashcards.repository.FlashcardRepository;
 import com.cpalmer.projects.flashcards.repository.UserRepository;
 import com.cpalmer.projects.flashcards.security.FlashcardUserDetailsService;
 import com.cpalmer.projects.flashcards.security.JwtService;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,8 @@ import java.util.Optional;
 @RequestMapping("api")
 public class FlashcardsApplicationController {
 
+    private static final Logger logger = LoggerFactory.getLogger(FlashcardsApplicationController.class);
+
     private final UserRepository userRepository;
     private final DeckRepository deckRepository;
     private final FlashcardRepository flashcardRepository;
@@ -33,11 +37,12 @@ public class FlashcardsApplicationController {
     private final JwtService jwtService;
     private final FlashcardUserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
+    private final MeterRegistry meterRegistry;
 
     public FlashcardsApplicationController(UserRepository userRepository, DeckRepository deckRepository,
                                            FlashcardRepository flashcardRepository, PasswordEncoder passwordEncoder,
                                            JwtService jwtService, FlashcardUserDetailsService userDetailsService,
-                                           AuthenticationManager authenticationManager) {
+                                           AuthenticationManager authenticationManager, MeterRegistry meterRegistry) {
         this.userRepository = userRepository;
         this.deckRepository = deckRepository;
         this.flashcardRepository = flashcardRepository;
@@ -45,6 +50,7 @@ public class FlashcardsApplicationController {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.authenticationManager = authenticationManager;
+        this.meterRegistry = meterRegistry;
     }
 
     @GetMapping("/current-user")
@@ -57,10 +63,12 @@ public class FlashcardsApplicationController {
         User user = userRepository.findByUsername(username);
 
         if (user == null) {
+            logger.info("Failed to get user: " + username);
             return ResponseEntity.notFound().build();
         }
 
         user.setPassword(null);
+
         return ResponseEntity.ok(user);
     }
 
@@ -71,6 +79,7 @@ public class FlashcardsApplicationController {
             User user = userRepository.findByUsername(userRequest.username());
 
             if (user == null) {
+                logger.info("Failed to log in user: " + userRequest.username());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
@@ -84,6 +93,7 @@ public class FlashcardsApplicationController {
             var userDetails = userDetailsService.loadUserByUsername(userRequest.username());
             String token = jwtService.generateToken(userDetails.getUsername());
 
+            logger.info("Logged in user: " + userRequest.username());
             return ResponseEntity.ok(new LoginResponse(token));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -95,7 +105,9 @@ public class FlashcardsApplicationController {
         String username = createUserRequest.username();
         String password = createUserRequest.password();
 
-        if (userRepository.findByUsername(username) != null) {
+        if (userRepository.findByUsername(username) != null || userRepository.count() > 30) {
+            logger.info("Could not create user: " + username);
+            this.meterRegistry.counter("users_created_failed").increment();
             return ResponseEntity.badRequest().build();
         }
 
@@ -103,19 +115,26 @@ public class FlashcardsApplicationController {
         User newUser = new User(username, encodedPassword);
         userRepository.save(newUser);
 
+        logger.info("Successfully created user: " + username);
+        this.meterRegistry.counter("users_created_success").increment();
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
 
     @PostMapping("/create/deck")
     public ResponseEntity<Deck> createNewDeck(@RequestBody CreateDeckRequest createDeckRequest) {
         int userId = createDeckRequest.userId();
         String deckName = createDeckRequest.deckName();
 
+        if (deckRepository.count() > 200) {
+            logger.warn("Max deck count reached, may need to upgrade database!");
+            return ResponseEntity.badRequest().build();
+        }
+
         User associatedUser = userRepository.findByUserId(userId);
         Deck deck = new Deck(deckName, associatedUser);
         Deck savedDeck = deckRepository.save(deck);
 
+        this.meterRegistry.counter("decks_created_success").increment();
         return ResponseEntity.ok(savedDeck);
     }
 
@@ -167,10 +186,21 @@ public class FlashcardsApplicationController {
         String frontText = createFlashcardRequest.frontText();
         String backText = createFlashcardRequest.backText();
 
+        if (frontText.length() > 1000 || backText.length() > 1000) {
+            logger.info("Could not create flashcard because front and back text was too long");
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (flashcardRepository.count() > 5000) {
+            logger.info("Max flashcard count reached, may need to upgrade database!");
+            return ResponseEntity.badRequest().build();
+        }
+
         Deck deck = deckRepository.findByDeckId(deckId);
         Flashcard flashcard = new Flashcard(deck, frontText, backText);
         Flashcard savedFlashcard = flashcardRepository.save(flashcard);
 
+        this.meterRegistry.counter("flashcards_created_success").increment();
         return ResponseEntity.ok(savedFlashcard);
     }
 

@@ -48,7 +48,8 @@ public class SecurityConfig {
                                 "decks.html",
                                 "flashcards.html",
                                 "/css/**",
-                                "/js/**"
+                                "/js/**",
+                                "/actuator/prometheus"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
